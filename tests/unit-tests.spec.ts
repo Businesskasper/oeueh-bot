@@ -12,8 +12,8 @@ describe('MessageResponder', () => {
   let mockedPingFinderInstance: PingFinder;
   let mockedMessageClass: Message;
   let mockedMessageInstance: Message;
-  let mockedPenisFinderClass: any;
-  let mockedPenisFinderInstance: any;
+  let mockedPenisFinderClass: PenisFinder;
+  let mockedPenisFinderInstance: PenisFinder;
 
   let service: MessageResponder;
 
@@ -21,7 +21,7 @@ describe('MessageResponder', () => {
     mockedPingFinderClass = mock(PingFinder);
     mockedPingFinderInstance = instance(mockedPingFinderClass);
     mockedPenisFinderClass = mock(PenisFinder);
-    mockedPenisFinderInstance = instance(mockedMessageClass);
+    mockedPenisFinderInstance = instance(mockedPenisFinderClass);
 
     mockedMessageClass = mock(Message);
     mockedMessageInstance = instance(mockedMessageClass);
