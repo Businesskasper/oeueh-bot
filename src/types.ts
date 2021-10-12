@@ -9,5 +9,7 @@ export const TYPES = {
   MappedResponder: Symbol('MappedResponder'),
   ResponseMap: Symbol('ResponseMap'),
   StretchScheduledMessenger: Symbol('StretchScheduledMessenger'),
-  ScheduledMessengerService: Symbol('ScheduledMessengerService')
+  ScheduledMessengerService: Symbol('ScheduledMessengerService'),
+  AppSettings: Symbol('AppSettings'),
+  LoggingService: Symbol('LoggingService')
 };

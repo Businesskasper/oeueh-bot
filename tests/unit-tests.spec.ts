@@ -5,6 +5,7 @@ import { instance, mock, verify, when } from 'ts-mockito';
 import { MappedResponder } from '../src/message-handler/mapped-responder/mapped-responder';
 import { MessageBroker } from '../src/message-broker';
 import { expect } from 'chai';
+import { SendMessageModel } from '../src/models/send-message.model';
 
 describe('MappedResponder', () => {
   let mappedResponder: MappedResponder;
@@ -44,15 +45,15 @@ describe('MessageBroker', () => {
   let mockedReceivedMessageClass = mock(Message);
   let mockedReceivedMessageInstance = instance(mockedReceivedMessageClass);
 
-  let sentMessage: string;
+  let sentMessage: SendMessageModel;
 
   messageBroker.onMessageReceived$.subscribe((message: Message) => mockedReceivedMessageInstance = message)
 
-  messageBroker.onSendMessage$.subscribe((messageContent: string) => sentMessage = messageContent);
+  messageBroker.onSendMessage$.subscribe((messageContent: SendMessageModel) => sentMessage = messageContent);
 
   before(() => {
     messageBroker.dispatchMessageReceived(mockedMessageInstance);
-    messageBroker.dispatchSendMessage('pong!')
+    messageBroker.dispatchSendMessage({messageText: 'pong!', channelId: ''})
   })
 
   it('should receive message', () => {
@@ -60,6 +61,6 @@ describe('MessageBroker', () => {
   });
 
   it('should send message', () => {
-    expect(sentMessage === 'pong!').to.be.true;
+    expect(sentMessage.messageText === 'pong!').to.be.true;
   });
 });

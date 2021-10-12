@@ -1,10 +1,9 @@
-import { Client, Message } from 'discord.js';
+import { Channel, Client, Message, MessageOptions, TextChannel } from 'discord.js';
 import { inject, injectable } from 'inversify';
 import { TYPES } from './types';
 import * as chalk from 'chalk';
-import { MessageHandlerService } from './message-handler/message-handler-service';
 import { MessageBroker } from './message-broker';
-import { ScheduledMessengerService } from './scheduler/scheduled-messenger-service';
+import { SendMessageModel } from './models/send-message.model';
 
 @injectable()
 export class Bot {
@@ -15,7 +14,7 @@ export class Bot {
     @inject(TYPES.MessageBroker) private messageBroker: MessageBroker,
   ) { }
 
-  public setup(): Promise<string> {
+  public listen(): Promise<string> {
     this.client.on('message', (message: Message) => {
       if (message.author.bot) {
         console.log(chalk.red('Ignoring bot message!'));
@@ -23,12 +22,16 @@ export class Bot {
       }
       this.messageBroker.dispatchMessageReceived(message);
     });
-    this.messageBroker.onSendMessage$.subscribe((messageText: string) => this.sendMessage(messageText));
+    this.messageBroker.onSendMessage$.subscribe((sendMessage: SendMessageModel) => this.sendMessage(sendMessage.messageText, sendMessage.channelId));
 
     return this.client.login(this.token);
   }
 
-  public sendMessage(messageText: string) {
-    // Todo: Logic for transmitting messages
+  public sendMessage(messageText: string, channelId: string) {
+    this.client.channels.fetch(channelId)
+      .then((channel: TextChannel) => channel.send({
+          content: messageText
+        })
+      )
   }
 }
