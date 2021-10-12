@@ -16,7 +16,7 @@ export class MessageHandlerService {
     constructor(
         @inject(TYPES.MessageBroker) private messageBroker: MessageBroker,
         @inject(TYPES.ValorantAgentResponder) private valorantAgentResponder: ValorantAgentResponder,
-        @inject(TYPES.ValorantAgentResponder) private todoResponder: TodoResponder,
+        @inject(TYPES.TodoResponder) private todoResponder: TodoResponder,
         @inject(TYPES.ResponseMap) private responseMap: Map<string, string>
     ) {
         this.messageHandlers.push(this.valorantAgentResponder, this.todoResponder);
