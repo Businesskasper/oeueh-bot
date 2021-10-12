@@ -46,8 +46,6 @@ export class TwitchAPI {
                 config
             );
 
-            console.log(streams);
-
             let listOfLiveStreams = [];
             for (let s in streamerIds) {
                 for (let p in streams.data.data) {
@@ -55,7 +53,7 @@ export class TwitchAPI {
                         let obj = {
                             user_id: streamerIds[s],
                             is_live: true,
-                            user_data: streams.data.data[s],
+                            user_data: streams.data.data[p],
                         };
                         listOfLiveStreams.push(obj);
                     } else {
@@ -77,7 +75,7 @@ export class TwitchAPI {
     buildQueryString(arr: string[]): string {
         let outputArry: string[] = [];
         for (let s in arr) {
-            outputArry.push(`user_id=${s}`);
+            outputArry.push(`user_id=${arr[s]}`);
         }
         return outputArry.join("&");
     }
