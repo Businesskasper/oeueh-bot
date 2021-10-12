@@ -13,8 +13,6 @@ export class Bot {
     @inject(TYPES.Client) private client: Client,
     @inject(TYPES.Token) private token: string,
     @inject(TYPES.MessageBroker) private messageBroker: MessageBroker,
-    @inject(TYPES.MessageHandlerService) private messageHandlerService: MessageHandlerService,
-    @inject(TYPES.ScheduledMessengerService) private scheduledMessengerService: ScheduledMessengerService
   ) { }
 
   public setup(): Promise<string> {
@@ -26,10 +24,6 @@ export class Bot {
       this.messageBroker.dispatchMessageReceived(message);
     });
     this.messageBroker.onSendMessage$.subscribe((messageText: string) => this.sendMessage(messageText));
-
-    // Register handlers and scheduled messages
-    this.messageHandlerService.registerResponder();
-    this.scheduledMessengerService.registerScheduler();
 
     return this.client.login(this.token);
   }
