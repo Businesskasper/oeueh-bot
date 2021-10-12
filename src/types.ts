@@ -2,9 +2,10 @@ export const TYPES = {
   Bot: Symbol('Bot'),
   Client: Symbol('Client'),
   Token: Symbol('Token'),
-  MessageResponder: Symbol('MessageResponder'),
-  PingFinder: Symbol('PingFinder'),
-  PenisFinder: Symbol('PenisFinder'),
-  AgentFinder: Symbol('AgentFinder'),
-  TodoFinder: Symbol('TodoFinder'),
+  MessageHandlerService: Symbol('MessageHandlerService'),
+  MessageBroker: Symbol('MessageBroker'),
+  ValorantAgentResponder: Symbol('ValorantAgentResponder'),
+  TodoResponder: Symbol('TodoResponder'),
+  MappedResponder: Symbol('MappedResponder'),
+  ResponseMap: Symbol('ResponseMap')
 };

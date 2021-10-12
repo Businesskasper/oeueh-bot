@@ -6,7 +6,6 @@ import * as chalk from 'chalk';
 
 let bot = container.get<Bot>(TYPES.Bot);
 
-// test
 bot
   .listen()
   .then((_) => console.log(chalk.green.bold(`Bot successfully started!`)))
