@@ -2,6 +2,10 @@
 
 Öüh Bot
 
+discord js documentation:
+
+https://discord.js.org/#/docs/main/stable/general/welcome
+
 ## Installation
 
 1. clone the repository

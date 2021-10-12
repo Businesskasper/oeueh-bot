@@ -1,7 +1,10 @@
-import { Client, Message } from "discord.js";
-import { inject, injectable } from "inversify";
-import { TYPES } from "./types";
-import { MessageResponder } from "./services/message-responder";
+import { Client, Message } from 'discord.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from './types';
+import { MessageResponder } from './services/message-responder';
+import * as chalk from 'chalk';
+
+const log = console.log;
 
 @injectable()
 export class Bot {
@@ -10,30 +13,34 @@ export class Bot {
   private messageResponder: MessageResponder;
 
   constructor(
-    @inject(TYPES.Client) client: Client, 
-    @inject(TYPES.Token) token: string, 
+    @inject(TYPES.Client) client: Client,
+    @inject(TYPES.Token) token: string,
     @inject(TYPES.MessageResponder) messageResponder: MessageResponder
-    ) { 
-      this.messageResponder = messageResponder;
-      this.token = token;
-      this.client = client;
-    }
-
+  ) {
+    this.messageResponder = messageResponder;
+    this.token = token;
+    this.client = client;
+  }
 
   public listen(): Promise<string> {
     this.client.on('message', (message: Message) => {
       if (message.author.bot) {
-        console.log('Ignoring bot message!')
+        console.log(chalk.red('Ignoring bot message!'));
         return;
       }
 
-      console.log("Message received! Contents: ", message.content);
+      log('*************');
+      log('Message received! Contents: ', chalk.bgGray.bold(message.content));
+      log('*************');
 
-      this.messageResponder.handle(message).then(() => {
-        console.log("Response sent!");
-      }).catch(() => {
-        console.log("Response not sent.")
-      })
+      this.messageResponder
+        .handle(message)
+        .then(() => {
+          log(chalk.green.bold('Response sent!'));
+        })
+        .catch(() => {
+          log(chalk.red.bold('Response sent!'));
+        });
     });
 
     return this.client.login(this.token);
