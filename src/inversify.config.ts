@@ -8,9 +8,11 @@ import { MappedResponder } from './message-handler/mapped-responder/mapped-respo
 import { ValorantAgentResponder } from './message-handler/valorant-agent-responder/valorant-agent-responder';
 import { TodoResponder } from './message-handler/todo-responder/todo-responder';
 import { MessageBroker } from './message-broker';
-import { MessageHandlerService } from './message-handler/message-handler-service';
+import { MessageHandlerService } from './message-handler/message-handler.service';
 import { StretchScheduledMessenger } from './scheduler/stretch-scheduled-messenger';
-import { ScheduledMessengerService } from './scheduler/scheduled-messenger-service';
+import { ScheduledMessengerService } from './scheduler/scheduled-messenger.service';
+import { appSettings, AppSettings } from './app-settings';
+import { LoggingService } from './logging.service';
 
 let container = new Container();
 
@@ -54,5 +56,14 @@ container
   .bind<StretchScheduledMessenger>(TYPES.StretchScheduledMessenger)  
   .to(StretchScheduledMessenger)
   .inSingletonScope();
+container
+  .bind<AppSettings>(TYPES.AppSettings)
+  .toConstantValue(appSettings);
+container
+  .bind<LoggingService>(TYPES.LoggingService)
+  .to(LoggingService)
+  .inSingletonScope();
+
+
 
 export default container;
