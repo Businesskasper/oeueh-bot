@@ -3,6 +3,15 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Debugging",
+            "preLaunchTask": "npm: build",
+            "program": "${workspaceFolder}/src/index.ts",
+            "outFiles": ["${workspaceFolder}/dist/src/**/*.js"],
+            "sourceMaps": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Mocha Tests",
             "preLaunchTask": "npm: build",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
