@@ -10,7 +10,7 @@ import { ValorantAgentResponder } from "./valorant-agent-responder/valorant-agen
 
 @injectable()
 export class MessageHandlerService {
-    
+
     private messageHandlers: IMessageHandler[] = new Array<IMessageHandler>();
 
     constructor(
@@ -18,7 +18,7 @@ export class MessageHandlerService {
         @inject(TYPES.ValorantAgentResponder) private valorantAgentResponder: ValorantAgentResponder,
         @inject(TYPES.ValorantAgentResponder) private todoResponder: TodoResponder,
         @inject(TYPES.ResponseMap) private responseMap: Map<string, string>
-    ) { 
+    ) {
         this.messageHandlers.push(this.valorantAgentResponder, this.todoResponder);
 
         // Setup mapped responders
@@ -30,7 +30,7 @@ export class MessageHandlerService {
     }
 
     public registerResponder(): void {
-        this.messageHandlers.forEach((handler: IMessageHandler) => 
+        this.messageHandlers.forEach((handler: IMessageHandler) =>
             this.messageBroker.onMessageReceived$.subscribe((message: Message) => handler.Handle(message))
         )
     }

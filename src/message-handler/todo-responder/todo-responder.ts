@@ -6,7 +6,7 @@ import { todos } from "./todos";
 
 @injectable()
 export class TodoResponder implements IMessageHandler {
-    
+
     private regex: string = 'todo';
 
     async Handle(message: Message): Promise<void> {

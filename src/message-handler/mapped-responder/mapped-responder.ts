@@ -4,7 +4,7 @@ import { IMessageHandler } from "../imessage-handler";
 
 @injectable()
 export class MappedResponder implements IMessageHandler {
-    
+
     private regex: string;
     private response: string;
 
