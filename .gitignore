@@ -2,3 +2,5 @@
 node_modules
 dist
 .editorconfig
+.nyc_output
+coverage
