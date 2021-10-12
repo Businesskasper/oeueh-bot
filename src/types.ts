@@ -7,5 +7,7 @@ export const TYPES = {
   ValorantAgentResponder: Symbol('ValorantAgentResponder'),
   TodoResponder: Symbol('TodoResponder'),
   MappedResponder: Symbol('MappedResponder'),
-  ResponseMap: Symbol('ResponseMap')
+  ResponseMap: Symbol('ResponseMap'),
+  StretchScheduledMessenger: Symbol('StretchScheduledMessenger'),
+  ScheduledMessengerService: Symbol('ScheduledMessengerService')
 };
