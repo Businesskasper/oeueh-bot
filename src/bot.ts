@@ -1,74 +1,40 @@
-import { Client, Message, TextChannel } from "discord.js";
-import { inject, injectable } from "inversify";
-import { TYPES } from "./types";
-import { MessageResponder } from "./services/message-responder";
-import * as cron from "node-cron";
-import * as chalk from "chalk";
-
-const log = console.log;
+import { Client, Message } from 'discord.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from './types';
+import * as chalk from 'chalk';
+import { MessageHandlerService } from './message-handler/message-handler-service';
+import { MessageBroker } from './message-broker';
+import { ScheduledMessengerService } from './scheduler/scheduled-messenger-service';
 
 @injectable()
 export class Bot {
-    private client: Client;
-    private readonly token: string;
-    private messageResponder: MessageResponder;
-    private channelID: string = "897218467596468244"; // öüh-bot channel. NOTE: channel must be textchannel to work properly!
 
-    constructor(
-        @inject(TYPES.Client) client: Client,
-        @inject(TYPES.Token) token: string,
-        @inject(TYPES.MessageResponder) messageResponder: MessageResponder
-    ) {
-        this.messageResponder = messageResponder;
-        this.token = token;
-        this.client = client;
-    }
+  constructor(
+    @inject(TYPES.Client) private client: Client,
+    @inject(TYPES.Token) private token: string,
+    @inject(TYPES.MessageBroker) private messageBroker: MessageBroker,
+    @inject(TYPES.MessageHandlerService) private messageHandlerService: MessageHandlerService,
+    @inject(TYPES.ScheduledMessengerService) private scheduledMessengerService: ScheduledMessengerService
+  ) { }
 
-    public listen(): Promise<string> {
-        this.client.on("message", (message: Message) => {
-            if (message.author.bot) {
-                console.log(chalk.red("Ignoring bot message!"));
-                return;
-            }
+  public setup(): Promise<string> {
+    this.client.on('message', (message: Message) => {
+      if (message.author.bot) {
+        console.log(chalk.red('Ignoring bot message!'));
+        return;
+      }
+      this.messageBroker.dispatchMessageReceived(message);
+    });
+    this.messageBroker.onSendMessage$.subscribe((messageText: string) => this.sendMessage(messageText));
 
-            log("*************");
-            log(
-                "Message received! Contents: ",
-                chalk.bgGray.bold(message.content)
-            );
-            log("*************");
+    // Register handlers and scheduled messages
+    this.messageHandlerService.registerResponder();
+    this.scheduledMessengerService.registerScheduler();
 
-            this.messageResponder
-                .handle(message)
-                .then(() => {
-                    log(chalk.green.bold("Response sent!"));
-                })
-                .catch(() => {
-                    log(chalk.red.bold("Response sent!"));
-                });
-        });
+    return this.client.login(this.token);
+  }
 
-        // runs every hour
-        cron.schedule("0 * * * *", async () => {
-            try {
-                //console.log(this.client.channels) if you want to get the channel ids;
-                // Note: channel must be TextChannel to work properly
-                const channel: TextChannel = this.client.channels.cache.get(
-                    this.channelID
-                ) as TextChannel;
-
-                await channel.send("It's Streching time!");
-
-                log(
-                    chalk.bgGreen.bold(
-                        `Reminder sent to channel: ${channel.name}`
-                    )
-                );
-            } catch (error) {
-                log(chalk.red.bold(error));
-            }
-        });
-
-        return this.client.login(this.token);
-    }
+  public sendMessage(messageText: string) {
+    // Todo: Logic for transmitting messages
+  }
 }
