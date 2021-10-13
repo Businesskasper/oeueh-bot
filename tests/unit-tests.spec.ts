@@ -1,73 +1,66 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 import 'mocha';
-import {expect} from 'chai';
-import {PingFinder} from "../src/services/ping-finder";
-import {MessageResponder} from "../src/services/message-responder";
-import {instance, mock, verify, when} from "ts-mockito";
-import {Message} from "discord.js";
-import { PenisFinder } from "../src/services/penis-finder";
+import { Message } from 'discord.js';
+import { instance, mock, verify, when } from 'ts-mockito';
+import { MappedResponder } from '../src/message-handler/mapped-responder/mapped-responder';
+import { MessageBroker } from '../src/message-broker';
+import { expect } from 'chai';
+import { SendMessageModel } from '../src/models/send-message.model';
 
-describe('MessageResponder', () => {
-  let mockedPingFinderClass: PingFinder;
-  let mockedPingFinderInstance: PingFinder;
+describe('MappedResponder', () => {
+  let mappedResponder: MappedResponder;
   let mockedMessageClass: Message;
   let mockedMessageInstance: Message;
-  let mockedPenisFinderClass: any;
-  let mockedPenisFinderInstance: any;
-
-  let service: MessageResponder;
 
   beforeEach(() => {
-    mockedPingFinderClass = mock(PingFinder);
-    mockedPingFinderInstance = instance(mockedPingFinderClass);
-    mockedPenisFinderClass = mock(PenisFinder);
-    mockedPenisFinderInstance = instance(mockedMessageClass);
-
-    mockedMessageClass = mock(Message);
-    mockedMessageInstance = instance(mockedMessageClass);
-    setMessageContents();
-
-    service = new MessageResponder(mockedPingFinderInstance, mockedPenisFinderInstance);
-  })
+    mappedResponder = new MappedResponder();
+    mappedResponder.setup('ping!', 'pong!')
+  });
 
   it('should reply', async () => {
-    whenIsPingThenReturn(true);
+    mockedMessageClass = mock(Message);
+    mockedMessageInstance = instance(mockedMessageClass);
+    mockedMessageInstance.content = 'ping!';
 
-    await service.handle(mockedMessageInstance);
-
+    mappedResponder.Handle(mockedMessageInstance);
     verify(mockedMessageClass.reply('pong!')).once();
-  })
+  });
 
   it('should not reply', async () => {
-    whenIsPingThenReturn(false);
+    mockedMessageClass = mock(Message);
+    mockedMessageInstance = instance(mockedMessageClass);
+    mockedMessageInstance.content = 'asdf!';
 
-    await service.handle(mockedMessageInstance).then(() => {
-      // Successful promise is unexpected, so we fail the test
-      expect.fail('Unexpected promise');
-    }).catch(() => {
-	 // Rejected promise is expected, so nothing happens here
-    });
-
+    mappedResponder.Handle(mockedMessageInstance);
     verify(mockedMessageClass.reply('pong!')).never();
-  })
-
-  function setMessageContents() {
-    mockedMessageInstance.content = "Non-empty string";
-  }
-
-  function whenIsPingThenReturn(result: boolean) {
-    when(mockedPingFinderClass.isPing("Non-empty string")).thenReturn(result);
-  }
+  });
 });
 
+describe('MessageBroker', () => {  
+  let messageBroker: MessageBroker = new MessageBroker();
+  let mockedMessageClass = mock(Message);
+  let mockedMessageInstance = instance(mockedMessageClass);
+  mockedMessageInstance.content = 'ping!';
 
-describe('PingFinder', () => {
-    let service: PingFinder;
-    beforeEach(() => {
-      service = new PingFinder();
-    })
-  
-    it('should find "ping" in the string', () => {
-      expect(service.isPing("ping")).to.be.true
-    })
+  let mockedReceivedMessageClass = mock(Message);
+  let mockedReceivedMessageInstance = instance(mockedReceivedMessageClass);
+
+  let sentMessage: SendMessageModel;
+
+  messageBroker.onMessageReceived$.subscribe((message: Message) => mockedReceivedMessageInstance = message)
+
+  messageBroker.onSendMessage$.subscribe((messageContent: SendMessageModel) => sentMessage = messageContent);
+
+  before(() => {
+    messageBroker.dispatchMessageReceived(mockedMessageInstance);
+    messageBroker.dispatchSendMessage({messageText: 'pong!', channelId: ''})
+  })
+
+  it('should receive message', () => {
+    expect(mockedReceivedMessageInstance.content === 'ping!').to.be.true;
   });
+
+  it('should send message', () => {
+    expect(sentMessage.messageText === 'pong!').to.be.true;
+  });
+});
