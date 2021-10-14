@@ -17,7 +17,7 @@ export class MessageHandlerService {
         @inject(TYPES.MessageBroker) private messageBroker: MessageBroker,
         @inject(TYPES.ValorantAgentResponder) private valorantAgentResponder: ValorantAgentResponder,
         @inject(TYPES.TodoResponder) private todoResponder: TodoResponder,
-        @inject(TYPES.ResponseMap) private responseMap: Map<string, string>
+        @inject(TYPES.ResponseMap) private responseMap: Map<string, string | string[]>
     ) {
         this.messageHandlers.push(this.valorantAgentResponder, this.todoResponder);
 
@@ -31,7 +31,6 @@ export class MessageHandlerService {
 
     public registerResponder(): void {
         this.messageHandlers.forEach((handler: IMessageHandler) =>
-            this.messageBroker.onMessageReceived$.subscribe((message: Message) => handler.Handle(message))
-        )
+            this.messageBroker.onMessageReceived$.subscribe((message: Message) => handler.Handle(message)))
     }
 }

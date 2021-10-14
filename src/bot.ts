@@ -16,7 +16,7 @@ export class Bot {
     @inject(TYPES.LoggingService) private loggingService: LoggingService
   ) { }
 
-  public listen(): Promise<string> {
+  public setup(): Promise<string> {
     this.client.on('message', (message: Message) => {
       if (message.author.bot) {
         this.loggingService.LogMessage('Ignoring bot message', false);

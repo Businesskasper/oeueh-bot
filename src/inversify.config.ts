@@ -18,7 +18,8 @@ let container = new Container();
 
 container
   .bind<Bot>(TYPES.Bot)
-  .to(Bot).inSingletonScope();
+  .to(Bot)
+  .inSingletonScope();
 container
   .bind<Client>(TYPES.Client)
   .toConstantValue(new Client());
@@ -38,7 +39,7 @@ container
   .bind<string>(TYPES.Token)
   .toConstantValue(process.env.TOKEN);
 container
-  .bind<Map<string, string>>(TYPES.ResponseMap)
+  .bind<Map<string, string | string[]>>(TYPES.ResponseMap)
   .toConstantValue(ResponseMap);
 container
   .bind<MessageBroker>(TYPES.MessageBroker)
