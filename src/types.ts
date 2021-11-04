@@ -10,5 +10,6 @@ export const TYPES = {
   ScheduledMessengerService: Symbol('ScheduledMessengerService'),
   AppSettings: Symbol('AppSettings'),
   LoggingService: Symbol('LoggingService'),
-  Log: Symbol('Log')
+  Log: Symbol('Log'),
+  DbService: Symbol('DbService')
 };
