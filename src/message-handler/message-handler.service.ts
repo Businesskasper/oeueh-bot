@@ -5,8 +5,6 @@ import { MessageBroker } from "../message-broker";
 import { TYPES } from "../types";
 import { IMessageHandler } from "./imessage-handler";
 import { MappedResponder } from "./mapped-responder/mapped-responder";
-import { TodoResponder } from "./todo-responder/todo-responder";
-import { ValorantAgentResponder } from "./valorant-agent-responder/valorant-agent-responder";
 
 @injectable()
 export class MessageHandlerService {
@@ -15,12 +13,8 @@ export class MessageHandlerService {
 
     constructor(
         @inject(TYPES.MessageBroker) private messageBroker: MessageBroker,
-        @inject(TYPES.ValorantAgentResponder) private valorantAgentResponder: ValorantAgentResponder,
-        @inject(TYPES.TodoResponder) private todoResponder: TodoResponder,
         @inject(TYPES.ResponseMap) private responseMap: Map<string, string | string[]>
     ) {
-        this.messageHandlers.push(this.valorantAgentResponder, this.todoResponder);
-
         // Setup mapped responders
         for (let responseKey of Array.from(this.responseMap.keys())) {
             let mappedHandler = container.get<MappedResponder>(TYPES.MappedResponder);

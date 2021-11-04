@@ -25,13 +25,12 @@ export class Bot {
       this.messageBroker.dispatchMessageReceived(message);
     });
     this.messageBroker.onSendMessage$.subscribe((sendMessage: SendMessageModel) => this.sendMessage(sendMessage.messageText, sendMessage.channelId));
-
+    
     return this.client.login(this.token);
   }
 
   public sendMessage(content: string, channelId: string) {
     this.client.channels.fetch(channelId)
-      .then((channel: TextChannel) => channel.send({content})
-      )
+      .then((channel: TextChannel) => channel.send({content}))
   }
 }

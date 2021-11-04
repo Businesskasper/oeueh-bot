@@ -20,5 +20,7 @@ bot
   .then(_ => logger.LogMessage('Bot successfully started!'))
   .catch(error => logger.LogError(error, false));
 
-const onTerminate = () => logger.LogWarning('Bot is shutting down!');
-['SIGHUP', 'SIGTERM', 'SIGINT'].forEach(ev => process.on(ev, onTerminate));
+// const onTerminate = () => {
+//   // logger.LogWarning('Bot is shutting down!');
+// }
+// ['SIGHUP', 'SIGTERM', 'SIGINT'].forEach(ev => process.on(ev, onTerminate));
