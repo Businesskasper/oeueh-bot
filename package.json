@@ -2,13 +2,12 @@
   "name": "oeueh-bot",
   "version": "1.0.0",
   "description": "Öüh Bot",
-  "main": "index.js",
   "scripts": {
     "start": "tsc -p tsconfig.json && node dist/src/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -p tsconfig.json -w",
-    "test": "tsc -p tsconfig.json && mocha -r ts-node/register \"dist/tests/**/*.spec.js\""
+    "test": "tsc -p tsconfig.json && mocha --parallel -r ts-node/register \"dist/tests/**/*.spec.js\""
   },
   "author": "",
   "license": "ISC",

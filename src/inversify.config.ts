@@ -5,8 +5,6 @@ import { Bot } from './bot';
 import { TYPES } from './types';
 import { ResponseMap } from './message-handler/mapped-responder/response-map';
 import { MappedResponder } from './message-handler/mapped-responder/mapped-responder';
-import { ValorantAgentResponder } from './message-handler/valorant-agent-responder/valorant-agent-responder';
-import { TodoResponder } from './message-handler/todo-responder/todo-responder';
 import { MessageBroker } from './message-broker';
 import { MessageHandlerService } from './message-handler/message-handler.service';
 import { StretchScheduledMessenger } from './scheduler/stretch-scheduled-messenger';
@@ -16,9 +14,13 @@ import { LoggingService } from './logging.service';
 
 let container = new Container();
 
+container.
+  bind<(message: any) => void>(TYPES.Log)
+  .toFunction(console.log);
 container
   .bind<Bot>(TYPES.Bot)
-  .to(Bot).inSingletonScope();
+  .to(Bot)
+  .inSingletonScope();
 container
   .bind<Client>(TYPES.Client)
   .toConstantValue(new Client());
@@ -27,18 +29,10 @@ container
   .to(MappedResponder)
   .inRequestScope();
 container
-  .bind<ValorantAgentResponder>(TYPES.ValorantAgentResponder)
-  .to(ValorantAgentResponder)
-  .inSingletonScope();
-container
-  .bind<TodoResponder>(TYPES.TodoResponder)
-  .to(TodoResponder)
-  .inSingletonScope();
-container
   .bind<string>(TYPES.Token)
   .toConstantValue(process.env.TOKEN);
 container
-  .bind<Map<string, string>>(TYPES.ResponseMap)
+  .bind<Map<string, string | string[]>>(TYPES.ResponseMap)
   .toConstantValue(ResponseMap);
 container
   .bind<MessageBroker>(TYPES.MessageBroker)
