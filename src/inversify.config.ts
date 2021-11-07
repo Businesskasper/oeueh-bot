@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { Container } from 'inversify';
-import { Client } from 'discord.js';
+import { Client, Intents } from 'discord.js';
 import { Bot } from './bot';
 import { TYPES } from './types';
 import { ResponseMap } from './message-handler/mapped-responder/response-map';
@@ -11,6 +11,10 @@ import { StretchScheduledMessenger } from './scheduler/stretch-scheduled-messeng
 import { ScheduledMessengerService } from './scheduler/scheduled-messenger.service';
 import { appSettings, AppSettings } from './app-settings';
 import { LoggingService } from './logging.service';
+import { SlashCommandService } from './slash-commands/slash-command.service';
+import { ReminderCommand } from './slash-commands/commands/reminder-command';
+import { BotRepository } from './db/bot-repository';
+import { DbService } from './db/db-service';
 
 let container = new Container();
 
@@ -23,7 +27,7 @@ container
   .inSingletonScope();
 container
   .bind<Client>(TYPES.Client)
-  .toConstantValue(new Client());
+  .toConstantValue(new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] }));
 container
   .bind<MappedResponder>(TYPES.MappedResponder)
   .to(MappedResponder)
@@ -31,6 +35,12 @@ container
 container
   .bind<string>(TYPES.Token)
   .toConstantValue(process.env.TOKEN);
+container
+  .bind<string>(TYPES.ClientId)
+  .toConstantValue(process.env.CLIENTID);
+container
+  .bind<string>(TYPES.GuildId)
+  .toConstantValue(process.env.GUILDID);
 container
   .bind<Map<string, string | string[]>>(TYPES.ResponseMap)
   .toConstantValue(ResponseMap);
@@ -57,7 +67,20 @@ container
   .bind<LoggingService>(TYPES.LoggingService)
   .to(LoggingService)
   .inSingletonScope();
-
-
+container
+  .bind<SlashCommandService>(TYPES.SlashCommandService)
+  .to(SlashCommandService)
+  .inSingletonScope();
+container
+  .bind<ReminderCommand>(TYPES.ReminderCommand)
+  .to(ReminderCommand)
+  .inSingletonScope();
+container
+  .bind<BotRepository>(TYPES.BotRepository)
+  .to(BotRepository)
+  .inSingletonScope();
+container
+  .bind<DbService>(TYPES.DbService)
+  .toConstantValue(new DbService('./bot.db').InitializeDatabase('./schema.txt'));
 
 export default container;

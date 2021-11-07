@@ -1,5 +1,6 @@
 import { Message } from "discord.js";
 import { inject, injectable } from "inversify";
+import { filter } from "rxjs";
 import container from "../inversify.config";
 import { MessageBroker } from "../message-broker";
 import { TYPES } from "../types";
@@ -25,6 +26,8 @@ export class MessageHandlerService {
 
     public registerResponder(): void {
         this.messageHandlers.forEach((handler: IMessageHandler) =>
-            this.messageBroker.onMessageReceived$.subscribe((message: Message) => handler.Handle(message)))
+            this.messageBroker.onMessageReceived$
+                .pipe(filter(message => message instanceof Message))
+                .subscribe((message: Message) => handler.Handle(message)))
     }
 }
