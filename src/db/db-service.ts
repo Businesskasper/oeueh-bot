@@ -1,7 +1,9 @@
 import * as bettersqlite3 from 'better-sqlite3';
 import * as fs from 'fs';
+import { injectable } from 'inversify';
 import { ReminderModel } from '../models/reminder-model';
 
+@injectable()
 export class DbService {
 
     private _database: bettersqlite3.Database;
@@ -24,35 +26,19 @@ export class DbService {
     }
 
     public GetReminder(): ReminderModel[] {
-        return this.ExecQuery<ReminderModel>(`select id, userId, message, date from Reminder`);
+        return this.ExecQuery<ReminderModel>(`select id, userId, message, date from Reminder`)
+            .map((reminder) => {
+                reminder.date = new Date(reminder.date);
+                return reminder;
+            });
     }
 
     public AddReminder(reminder: ReminderModel): void {
         let {userId, message, date} = reminder;
-        this.ExecQuery(`REPLACE INTO Reminder (userId, message, date) VALUES (?, ?, ?)`, [userId, message, date])
+        this.ExecNonQuery(`REPLACE INTO Reminder (userId, message, date) VALUES (?, ?, ?)`, [userId, message, date.valueOf().toString()])
     }
 
-    // public InsertServer(hostName: string, countInfoma: number, countITS: number, inventoryDate: string): void {
-		
-    //     let insertString = `
-    //         REPLACE INTO Server (HostName, CountInfoma, CountITS, InventoryDate) 
-    //         VALUES (?, ?, ?, ?)
-    //     `;
-        
-    //     this.ExecNonQuery(insertString, [hostName?.trim().toUpperCase(), countInfoma, countITS, inventoryDate]);
-    // }
-
-    // public GetServer(hostName: string = undefined): Server[] {
-
-    //     let result: Server[] = (hostName !== undefined && hostName.trim() !== "") ? 
-    //         this.ExecQuery<Server>('SELECT * FROM Server WHERE HostName = ?', [hostName.trim().toUpperCase()]) :
-    //         this.ExecQuery<Server>('SELECT * FROM Server');
-    
-    //     return [].concat(result);
-    // }
-
-    // public DeleteServer(serverToDelete: Server): void {
-
-    //     this.ExecNonQuery('DELETE FROM Server WHERE HostName = ?' , [serverToDelete.HostName]);
-    // }
+    public DeleteReminder(id: number): void {
+        this.ExecNonQuery(`DELETE FROM Reminder WHERE id = ?`, [id])
+    }
 }

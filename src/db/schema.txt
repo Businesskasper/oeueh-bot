@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS Reminder (
-    id INTEGER PRIMARY KEY,
-    message TEXT,
-    userId INTEGER
-    date TEXT;
-)

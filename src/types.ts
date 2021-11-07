@@ -11,5 +11,10 @@ export const TYPES = {
   AppSettings: Symbol('AppSettings'),
   LoggingService: Symbol('LoggingService'),
   Log: Symbol('Log'),
-  DbService: Symbol('DbService')
+  DbService: Symbol('DbService'),
+  BotRepository: Symbol('BotRepository'),
+  ClientId: Symbol('ClientId'),
+  GuildId: Symbol('GuildId'),
+  SlashCommandService: Symbol('SlashCommandService'),
+  ReminderCommand: Symbol('ReminderCommand')
 };

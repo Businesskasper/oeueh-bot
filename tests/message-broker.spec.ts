@@ -5,6 +5,7 @@ import { instance, mock } from 'ts-mockito';
 import { MessageBroker } from '../src/message-broker';
 import { expect } from 'chai';
 import { SendMessageModel } from '../src/models/send-message.model';
+import { filter } from 'rxjs';
 
 describe('MessageBroker', () => {  
   let messageBroker: MessageBroker = new MessageBroker();
@@ -17,7 +18,9 @@ describe('MessageBroker', () => {
 
   let sentMessage: SendMessageModel;
 
-  messageBroker.onMessageReceived$.subscribe((message: Message) => mockedReceivedMessageInstance = message);
+  messageBroker.onMessageReceived$
+    .pipe(filter(message => message instanceof Message))
+    .subscribe((message: Message) => mockedReceivedMessageInstance = message);
   messageBroker.onSendMessage$.subscribe((messageContent: SendMessageModel) => sentMessage = messageContent);
 
   before(() => {
