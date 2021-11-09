@@ -4,7 +4,7 @@ import { inject, injectable } from 'inversify';
 import { interval, take } from 'rxjs';
 import { BotRepository } from '../../db/bot-repository';
 import { MessageBroker } from '../../message-broker';
-import { ReminderModel } from '../../models/reminder-model';
+import { ReminderModel } from '../../models/reminder.model';
 import { TYPES } from '../../types';
 import { SlashCommand } from '../slash-command';
 
@@ -24,7 +24,7 @@ export class ReminderCommand extends SlashCommand {
 
     public command: Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> =  new SlashCommandBuilder()
         .setName('reminder')
-        .setDescription('Ich erinnere dich an was du willst Baby')
+        .setDescription('Schickt dir einen friendly reminder')
         .addStringOption(option => 
             option.setName('was')
                 .setDescription('An was willst du erinnert werden?')

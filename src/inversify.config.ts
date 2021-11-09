@@ -15,6 +15,7 @@ import { SlashCommandService } from './slash-commands/slash-command.service';
 import { ReminderCommand } from './slash-commands/commands/reminder-command';
 import { BotRepository } from './db/bot-repository';
 import { DbService } from './db/db-service';
+import { SoundCommand } from './slash-commands/commands/sound-command';
 
 let container = new Container();
 
@@ -27,7 +28,7 @@ container
   .inSingletonScope();
 container
   .bind<Client>(TYPES.Client)
-  .toConstantValue(new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] }));
+  .toConstantValue(new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] }));
 container
   .bind<MappedResponder>(TYPES.MappedResponder)
   .to(MappedResponder)
@@ -82,5 +83,10 @@ container
 container
   .bind<DbService>(TYPES.DbService)
   .toConstantValue(new DbService('./bot.db').InitializeDatabase('./schema.txt'));
+container
+  .bind<SoundCommand>(TYPES.SoundCommand)
+  .to(SoundCommand)
+  .inSingletonScope();
+
 
 export default container;

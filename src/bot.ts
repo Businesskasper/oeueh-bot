@@ -1,4 +1,4 @@
-import { Channel, Client, CommandInteraction, Message, TextChannel, User } from 'discord.js';
+import { Channel, Client, CommandInteraction, Message, TextChannel, User, VoiceChannel } from 'discord.js';
 import { inject, injectable } from 'inversify';
 import { TYPES } from './types';
 import { MessageBroker } from './message-broker';
@@ -8,9 +8,14 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { debounceTime } from 'rxjs';
 import { SlashCommand } from './slash-commands/slash-command';
+import { PlaySoundModel } from './models/play-sound.model';
+import { NoSubscriberBehavior, AudioPlayerStatus, joinVoiceChannel, VoiceConnectionStatus, createAudioResource, createAudioPlayer, AudioPlayer, VoiceConnection } from '@discordjs/voice';
+import ytdl = require('ytdl-core');
 
 @injectable()
 export class Bot {
+
+  private playerMap: Map<string, {player: AudioPlayer, voiceChat: VoiceConnection}> = new Map<string, any>();
 
   constructor(
     @inject(TYPES.Client) private client: Client,
@@ -39,9 +44,15 @@ export class Bot {
 
     this.messageBroker.onCommandsRegistered$
       .pipe(debounceTime(300))
-      .subscribe((slashCommands: SlashCommand[]) => this.registerSlashCommands(slashCommands))
+      .subscribe((slashCommands: SlashCommand[]) => this.registerSlashCommands(slashCommands));
 
-    return new Promise((resolve, reject) => {      
+    this.messageBroker.onPlaySound$
+      .subscribe((playSoundModel: PlaySoundModel) => this.playSoundToUser(playSoundModel.userId, playSoundModel.filePath, playSoundModel.url));
+
+    this.messageBroker.onStopSound$
+      .subscribe((stopSoundForUserId: string) => this.stopSoundToUser(stopSoundForUserId));
+
+    return new Promise((resolve, reject) => {
       this.client.login(this.token)
         .then(_ => resolve(this))
         .catch(err => {
@@ -55,22 +66,22 @@ export class Bot {
     const rest = new REST({ version: '9' }).setToken(this.token);
     return new Promise((resolve, reject) => {
       rest.put(Routes.applicationGuildCommands(this.clientId, this.guildId), { body: commandsToRegister })
-      .then(_ => resolve())
-      .catch(err => {
-        reject(err)
-      })
+        .then(_ => resolve())
+        .catch(err => {
+          reject(err)
+        })
     })
   }
 
   private sendMessage(content: string, channelId: string, userId: string) {
     if (channelId) {
       this.getChannel(channelId)
-        .then((channel: TextChannel) => channel.send({content}))
+        .then((channel: TextChannel) => channel.send({ content }))
     }
     if (userId) {
       this.getUser(userId)
         .then((user: User) => {
-          user.send({content})
+          user.send({ content })
         })
         .catch(err => {
           this.loggingService.LogError(`Error on fetching user with id ${userId}: \n ${err}`)
@@ -96,5 +107,65 @@ export class Bot {
     else {
       return this.client.users.fetch(userId);
     }
+  }
+
+  private playSoundToUser(userId: string, filePath: string, url: string): void {
+    this.client.guilds.fetch(this.guildId)
+      .then(guild => {
+        guild.members.fetch(userId)
+          .then(member => {
+            const channelId = member.voice.channel.id;
+            this.stopChannelSound(channelId);
+            const connection = joinVoiceChannel({ 
+              guildId: this.guildId, 
+              channelId: channelId, 
+              adapterCreator: guild.voiceAdapterCreator, 
+              selfMute: false, 
+            selfDeaf: false })
+
+            let resource;
+            if (url && url.length > 0) {
+              // resource = createAudioResource(ytdl(url))
+              const stream = new prism.FFmpeg({
+                args: ['-reconnect_streamed', '1', '-reconnect_at_eof', '1', '-reconnect_on_network_error', '1', '-reconnect_on_http_error', '1', '-reconnect_delay_max', '5', '-i', 'your url here', ...FFMPEG_OPUS_ARGUMENTS],
+              });
+              
+              const resource = createAudioResource(stream, { inputType: StreamType.OggOpus });
+            }
+            else {
+              filePath = require("path").join(__dirname, '..', '..', filePath);
+              resource = createAudioResource(filePath);
+            }
+            const player = createAudioPlayer();
+            player.on('stateChange', (oldState, newState) => {
+              console.log(newState.status)
+              if (oldState.status == AudioPlayerStatus.Playing && newState.status == AudioPlayerStatus.Idle) {
+                this.stopChannelSound(channelId);
+              }
+            });
+            this.playerMap.set(channelId, {player, voiceChat: connection});
+            connection.subscribe(player);
+            player.play(resource);
+          })
+      })
+  }
+
+  private stopSoundToUser(userId: string): void {
+    this.client.guilds.fetch(this.guildId)
+      .then(guild => {
+        guild.members.fetch(userId)
+          .then(member => this.stopChannelSound(member.voice.channel.id))
+      })
+  }
+
+  private stopChannelSound(channelId: string): void {    
+    if (!this.playerMap.has(channelId)) {
+      return
+    }
+    console.log('removeListener')
+    const player = this.playerMap.get(channelId);
+    player.player.removeAllListeners();
+    player.voiceChat.destroy();
+    this.playerMap.delete(channelId);
   }
 }

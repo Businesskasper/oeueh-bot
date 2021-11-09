@@ -1,7 +1,8 @@
 import * as bettersqlite3 from 'better-sqlite3';
 import * as fs from 'fs';
 import { injectable } from 'inversify';
-import { ReminderModel } from '../models/reminder-model';
+import { ReminderModel } from '../models/reminder.model';
+import { SoundCommandModel } from '../models/sound-command.model';
 
 @injectable()
 export class DbService {
@@ -40,5 +41,21 @@ export class DbService {
 
     public DeleteReminder(id: number): void {
         this.ExecNonQuery(`DELETE FROM Reminder WHERE id = ?`, [id])
+    }
+
+    public AddSoundCommand(soundCommand: SoundCommandModel) {
+        let {commandName, filePath, link} = soundCommand;
+        commandName = commandName && commandName.length > 0 ? commandName : '';
+        filePath = filePath && filePath.length > 0 ? filePath : '';
+        link = link && link.length > 0 ? link: '';
+        this.ExecNonQuery(`REPLACE INTO SoundCommand (commandName, filePath, link) VALUES(?, ?, ?)`, [commandName, filePath, link]);
+    }
+
+    public GetSoundCommands(): SoundCommandModel[] {
+        return this.ExecQuery<SoundCommandModel>(`SELECT id, commandName, filePath, link FROM SoundCommand`);
+    }
+
+    public DeleteSoundCommand(soundCommandId: number) {
+        this.ExecNonQuery(`DELETE FROM SoundCommand WHERE id = ?`, [soundCommandId]);
     }
 }

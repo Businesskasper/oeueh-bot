@@ -3,4 +3,11 @@ CREATE TABLE IF NOT EXISTS Reminder (
     message TEXT,
     userId TEXT,
     date INTEGER
-)
+);
+
+CREATE TABLE IF NOT EXISTS SoundCommand (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    commandName TEXT,
+    filePath TEXT,
+    link TEXT
+);

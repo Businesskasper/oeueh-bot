@@ -16,5 +16,8 @@ export const TYPES = {
   ClientId: Symbol('ClientId'),
   GuildId: Symbol('GuildId'),
   SlashCommandService: Symbol('SlashCommandService'),
-  ReminderCommand: Symbol('ReminderCommand')
+  ReminderCommand: Symbol('ReminderCommand'),
+  AddSoundCommand: Symbol('AddSoundCommand'),
+  PlaySoundCommand: Symbol('PlaySoundCommand'),
+  SoundCommand: Symbol('SoundCommand')
 };
