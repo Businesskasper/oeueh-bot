@@ -3,7 +3,7 @@ export interface AppSettings {
     MessageChannelId: string;
 }
 
-export const appSettings = {
-    LogChannelId: '897587487428476968',
-    MessageChannelId: '897218467596468244'
-}
+export const appSettings: AppSettings = {
+    LogChannelId: process.env.LOG_CHANNEL_ID || "",
+    MessageChannelId: process.env.MESSAGE_CHANNEL_ID || "",
+};

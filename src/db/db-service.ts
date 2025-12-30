@@ -1,21 +1,24 @@
-import * as bettersqlite3 from 'better-sqlite3';
-import * as fs from 'fs';
-import { injectable } from 'inversify';
-import { ReminderModel } from '../models/reminder.model';
-import { SoundCommandModel } from '../models/sound-command.model';
+import bettersqlite3, { Database } from "better-sqlite3";
+import * as fs from "fs";
+import { injectable } from "inversify";
+import { ReminderModel } from "../models/reminder.model";
+import { SoundCommandModel } from "../models/sound-command.model";
 
 @injectable()
 export class DbService {
-
-    private _database: bettersqlite3.Database;
+    private _database: Database;
 
     constructor(dbPath: string) {
-        this._database = new bettersqlite3(dbPath, {verbose: console.log});
+        this._database = new bettersqlite3(dbPath, {
+            verbose: console.log,
+        });
     }
 
     public InitializeDatabase(dbSetupFile: string): DbService {
-        this._database.exec(fs.readFileSync(dbSetupFile, {encoding: 'utf-8'}));
-		return this;
+        this._database.exec(
+            fs.readFileSync(dbSetupFile, { encoding: "utf-8" }),
+        );
+        return this;
     }
 
     private ExecNonQuery(nonQuery: string, params: any[] = null): void {
@@ -23,39 +26,50 @@ export class DbService {
     }
 
     private ExecQuery<T>(query: string, params: any[] = []): T[] {
-        return <T[]>(this._database.prepare(query?.trim()).all(params));
+        return <T[]>this._database.prepare(query?.trim()).all(params);
     }
 
     public GetReminder(): ReminderModel[] {
-        return this.ExecQuery<ReminderModel>(`select id, userId, message, date from Reminder`)
-            .map((reminder) => {
-                reminder.date = new Date(reminder.date);
-                return reminder;
-            });
+        return this.ExecQuery<ReminderModel>(
+            `select id, userId, message, date from Reminder`,
+        ).map((reminder) => {
+            reminder.date = new Date(reminder.date);
+            return reminder;
+        });
     }
 
     public AddReminder(reminder: ReminderModel): void {
-        let {userId, message, date} = reminder;
-        this.ExecNonQuery(`REPLACE INTO Reminder (userId, message, date) VALUES (?, ?, ?)`, [userId, message, date.valueOf().toString()])
+        const { userId, message, date } = reminder;
+        this.ExecNonQuery(
+            `REPLACE INTO Reminder (userId, message, date) VALUES (?, ?, ?)`,
+            [userId, message, date.valueOf().toString()],
+        );
     }
 
     public DeleteReminder(id: number): void {
-        this.ExecNonQuery(`DELETE FROM Reminder WHERE id = ?`, [id])
+        this.ExecNonQuery(`DELETE FROM Reminder WHERE id = ?`, [id]);
     }
 
     public AddSoundCommand(soundCommand: SoundCommandModel) {
-        let {commandName, filePath, link} = soundCommand;
-        commandName = commandName && commandName.length > 0 ? commandName : '';
-        filePath = filePath && filePath.length > 0 ? filePath : '';
-        link = link && link.length > 0 ? link: '';
-        this.ExecNonQuery(`REPLACE INTO SoundCommand (commandName, filePath, link) VALUES(?, ?, ?)`, [commandName, filePath, link]);
+        let { commandName, filePath, link } = soundCommand;
+        commandName = commandName && commandName.length > 0 ? commandName : "";
+        filePath = filePath && filePath.length > 0 ? filePath : "";
+        link = link && link.length > 0 ? link : "";
+        this.ExecNonQuery(
+            `REPLACE INTO SoundCommand (commandName, filePath, link) VALUES(?, ?, ?)`,
+            [commandName, filePath, link],
+        );
     }
 
     public GetSoundCommands(): SoundCommandModel[] {
-        return this.ExecQuery<SoundCommandModel>(`SELECT id, commandName, filePath, link FROM SoundCommand`);
+        return this.ExecQuery<SoundCommandModel>(
+            `SELECT id, commandName, filePath, link FROM SoundCommand`,
+        );
     }
 
     public DeleteSoundCommand(soundCommandId: number) {
-        this.ExecNonQuery(`DELETE FROM SoundCommand WHERE id = ?`, [soundCommandId]);
+        this.ExecNonQuery(`DELETE FROM SoundCommand WHERE id = ?`, [
+            soundCommandId,
+        ]);
     }
 }

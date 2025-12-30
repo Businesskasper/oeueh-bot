@@ -6,15 +6,16 @@ import { TYPES } from "./types";
 
 @injectable()
 export class LoggingService {
-
     constructor(
-        @inject(TYPES.MessageBroker) private messageBroker: MessageBroker,
-        @inject(TYPES.AppSettings) private appSettings: AppSettings,
+        @inject(TYPES.MessageBroker)
+        private messageBroker: MessageBroker,
+        @inject(TYPES.AppSettings)
+        private appSettings: AppSettings,
         @inject(TYPES.Log) private log: (message: any) => void,
-    ) { }
+    ) {}
 
     public LogMessage(message: string, logToDiscord: boolean = true): void {
-        let formattedMessage = `${this.getFormattedDateTime()}: ${message}`;
+        const formattedMessage = `${this.getFormattedDateTime()}: ${message}`;
         this.log(chalk.green.bold(formattedMessage));
         if (logToDiscord) {
             this.logToDiscord(formattedMessage);
@@ -22,7 +23,7 @@ export class LoggingService {
     }
 
     public LogWarning(message: string, logToDiscord: boolean = true): void {
-        let formattedMessage = `${this.getFormattedDateTime()}: WARNING - ${message}`;
+        const formattedMessage = `${this.getFormattedDateTime()}: WARNING - ${message}`;
         this.log(chalk.yellow.bold(formattedMessage));
         if (logToDiscord) {
             this.logToDiscord(formattedMessage);
@@ -30,7 +31,7 @@ export class LoggingService {
     }
 
     public LogError(message: string, logToDiscord: boolean = true): void {
-        let formattedMessage = `${this.getFormattedDateTime()}: ERROR - ${message}`;
+        const formattedMessage = `${this.getFormattedDateTime()}: ERROR - ${message}`;
         this.log(chalk.red.bold(formattedMessage));
         if (logToDiscord) {
             this.logToDiscord(formattedMessage);
@@ -38,11 +39,16 @@ export class LoggingService {
     }
 
     private logToDiscord(formattedMessage: string) {
-        this.messageBroker.dispatchSendMessage({ channelId: this.appSettings.LogChannelId, messageText: formattedMessage });
+        this.messageBroker.dispatchSendMessage({
+            channelId: this.appSettings.LogChannelId,
+            messageText: formattedMessage,
+        });
     }
 
     private getFormattedDateTime(): string {
-        let now: Date = new Date();
-        return `${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+        const now: Date = new Date();
+        return `${now.getDate()}.${
+            now.getMonth() + 1
+        }.${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
     }
 }

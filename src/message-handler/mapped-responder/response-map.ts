@@ -1,41 +1,42 @@
 export const ResponseMap = new Map<string, string | string[]>([
-    ['ping!', 'pong!'],
-    ['hallo!', 'grüß dich!'],
-    ['wutbürger',
+    ["ping!", "pong!"],
+    ["hallo!", "grüß dich!"],
+    [
+        "wutbürger",
         [
-            'Die Merkel muss WEG!11!!1',
-            'Corona Schworona',
-            'Deutschland schafft scih ab!'
-        ]
+            "Die Merkel muss WEG!11!!1",
+            "Corona Schworona",
+            "Deutschland schafft scih ab!",
+        ],
     ],
     [
-        'todo',
+        "todo",
         [
-            'zeit für Valorant!',
-            'runde CS jetzt los!',
-            'jetzt wird programmiert!',
-            'ruhe jetzt bedsche'
-        ]
+            "zeit für Valorant!",
+            "runde CS jetzt los!",
+            "jetzt wird programmiert!",
+            "ruhe jetzt bedsche",
+        ],
     ],
     [
-        'agent',
+        "agent",
         [
-            'Brimstone',
-            'Viper',
-            'Omen',
-            'Killjoy',
-            'Cypher',
-            'Sova',
-            'Sage',
-            'Phoenix',
-            'Jett',
-            'Reyna',
-            'Raze',
-            'Breach',
-            'Skye',
-            'Yoru',
-            'Astra',
-            'KAY/O',
-        ]
-    ]
-])
+            "Brimstone",
+            "Viper",
+            "Omen",
+            "Killjoy",
+            "Cypher",
+            "Sova",
+            "Sage",
+            "Phoenix",
+            "Jett",
+            "Reyna",
+            "Raze",
+            "Breach",
+            "Skye",
+            "Yoru",
+            "Astra",
+            "KAY/O",
+        ],
+    ],
+]);

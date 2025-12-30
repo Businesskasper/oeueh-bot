@@ -1,6 +1,3 @@
 {
-	"recommendations": [
-        "maty.vscode-mocha-sidebar",
-        "alexcvzz.vscode-sqlite"
-    ]
+    "recommendations": ["maty.vscode-mocha-sidebar", "alexcvzz.vscode-sqlite"]
 }
