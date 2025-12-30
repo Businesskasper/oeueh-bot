@@ -23,12 +23,10 @@
                 "--slow",
                 "5000",
                 "--colors",
-                "${workspaceFolder}/dist/tests/**/*.spec.js",
+                "${workspaceFolder}/dist/tests/**/*.spec.js"
             ],
             "internalConsoleOptions": "openOnSessionStart",
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
+            "skipFiles": ["<node_internals>/**"]
         }
     ]
 }

@@ -4,3 +4,4 @@ dist
 .editorconfig
 .nyc_output
 coverage
+sounds/**/*.*

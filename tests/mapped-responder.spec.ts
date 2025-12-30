@@ -1,29 +1,29 @@
-import 'reflect-metadata';
-import 'mocha';
-import { Message } from 'discord.js';
-import { instance, mock, reset, verify, when } from 'ts-mockito';
-import { MappedResponder } from '../src/message-handler/mapped-responder/mapped-responder';
+import { Message } from "discord.js";
+import "mocha";
+import "reflect-metadata";
+import { instance, mock, reset, verify } from "ts-mockito";
+import { MappedResponder } from "../src/message-handler/mapped-responder/mapped-responder";
 
-describe('MappedResponder', () => {
-  let mappedResponder = new MappedResponder();
-  mappedResponder.setup('ping!', 'pong!')
+describe("MappedResponder", () => {
+    const mappedResponder = new MappedResponder();
+    mappedResponder.setup("ping!", "pong!");
 
-  let mockedMessage = mock(Message);
-  let mockedMessageInstance = instance(mockedMessage);
+    const mockedMessage = mock(Message);
+    const mockedMessageInstance = instance(mockedMessage);
 
-  beforeEach(() => {
-    reset(mockedMessage);
-  })
+    beforeEach(() => {
+        reset(mockedMessage);
+    });
 
-  it('should reply', () => {
-    mockedMessageInstance.content = 'ping!';
-    mappedResponder.Handle(mockedMessageInstance);
-    verify(mockedMessage.reply('pong!')).once();
-  });
+    it("should reply", () => {
+        mockedMessageInstance.content = "ping!";
+        mappedResponder.Handle(mockedMessageInstance);
+        verify(mockedMessage.reply("pong!")).once();
+    });
 
-  it('should not reply', () => {
-    mockedMessageInstance.content = 'asdf!';
-    mappedResponder.Handle(mockedMessageInstance);
-    verify(mockedMessage.reply('pong!')).never();
-  });
+    it("should not reply", () => {
+        mockedMessageInstance.content = "asdf!";
+        mappedResponder.Handle(mockedMessageInstance);
+        verify(mockedMessage.reply("pong!")).never();
+    });
 });
