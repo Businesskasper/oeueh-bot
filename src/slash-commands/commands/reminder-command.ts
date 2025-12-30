@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction, Interaction } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import { inject, injectable } from "inversify";
-import { interval, take } from "rxjs";
+import { interval } from "rxjs";
 import { BotRepository } from "../../db/bot-repository";
 import { MessageBroker } from "../../message-broker";
 import { ReminderModel } from "../../models/reminder-model";
@@ -53,7 +53,7 @@ export class ReminderCommand extends SlashCommand {
         const userId = interaction.user.id;
 
         let response = "";
-        let now = new Date();
+        const now = new Date();
         let remindDate: Date;
         switch (reminderTime) {
             case "1d":
