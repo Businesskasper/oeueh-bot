@@ -1,5 +1,6 @@
 import { Message } from "discord.js";
 import { inject, injectable } from "inversify";
+import { filter } from "rxjs";
 import container from "../inversify.config";
 import { MessageBroker } from "../message-broker";
 import { TYPES } from "../types";
@@ -8,29 +9,40 @@ import { MappedResponder } from "./mapped-responder/mapped-responder";
 
 @injectable()
 export class MessageHandlerService {
-    private messageHandlers: IMessageHandler[] = new Array<IMessageHandler>();
+	private messageHandlers: IMessageHandler[] =
+		new Array<IMessageHandler>();
 
-    constructor(
-        @inject(TYPES.MessageBroker)
-        private messageBroker: MessageBroker,
-        @inject(TYPES.ResponseMap)
-        private responseMap: Map<string, string | string[]>,
-    ) {
-        // Setup mapped responders
-        for (const responseKey of Array.from(this.responseMap.keys())) {
-            const mappedHandler = container.get<MappedResponder>(
-                TYPES.MappedResponder,
-            );
-            mappedHandler.setup(responseKey, this.responseMap.get(responseKey));
-            this.messageHandlers.push(mappedHandler);
-        }
-    }
+	constructor(
+		@inject(TYPES.MessageBroker)
+		private messageBroker: MessageBroker,
+		@inject(TYPES.ResponseMap)
+		private responseMap: Map<string, string | string[]>
+	) {
+		// Setup mapped responders
+		for (const responseKey of Array.from(
+			this.responseMap.keys()
+		)) {
+			const mappedHandler = container.get<MappedResponder>(
+				TYPES.MappedResponder
+			);
+			mappedHandler.setup(
+				responseKey,
+				this.responseMap.get(responseKey)
+			);
+			this.messageHandlers.push(mappedHandler);
+		}
+	}
 
-    public registerResponder(): void {
-        this.messageHandlers.forEach((handler: IMessageHandler) =>
-            this.messageBroker.onMessageReceived$.subscribe(
-                (message: Message) => handler.Handle(message),
-            ),
-        );
-    }
+	public registerResponder(): void {
+		this.messageHandlers.forEach(
+			(handler: IMessageHandler) =>
+				this.messageBroker.onMessageReceived$
+					.pipe(
+						filter(message => message instanceof Message)
+					)
+					.subscribe((message: Message) =>
+						handler.Handle(message)
+					)
+		);
+	}
 }
