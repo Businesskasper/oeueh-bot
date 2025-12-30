@@ -5,8 +5,7 @@ import { DbService } from "./db-service";
 
 @injectable()
 export class BotRepository {
-
-    constructor(@inject(TYPES.DbService) private _dbService: DbService) { }
+    constructor(@inject(TYPES.DbService) private _dbService: DbService) {}
 
     public GetReminder(): ReminderModel[] {
         return this._dbService.GetReminder();

@@ -1,5 +1,5 @@
 export interface SendMessageModel {
-	messageText: string;
-	channelId?: string;
-	userId?: string;
+    messageText: string;
+    channelId?: string;
+    userId?: string;
 }
