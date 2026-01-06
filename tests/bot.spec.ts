@@ -8,31 +8,27 @@ import container from "../src/inversify.config";
 import { TYPES } from "../src/types";
 
 describe("Bot -> Client integration", () => {
-	const fakeToken = "token";
-	container
-		.rebind<AppSettings>(TYPES.AppSettings)
-		.toConstantValue({
-			Token: fakeToken,
-			ClientId: "id",
-			GuildId: "gid",
-			LogChannelId: "logid",
-			MessageChannelId: "msgid",
-		});
+    const fakeToken = "token";
+    container.rebind<AppSettings>(TYPES.AppSettings).toConstantValue({
+        Token: fakeToken,
+        ClientId: "id",
+        GuildId: "gid",
+        LogChannelId: "logid",
+        MessageChannelId: "msgid",
+    });
 
-	const clientMock = mock(Client);
-	const clientInstance = instance(clientMock);
-	container
-		.rebind<Client>(TYPES.Client)
-		.toConstantValue(clientInstance);
+    const clientMock = mock(Client);
+    const clientInstance = instance(clientMock);
+    container.rebind<Client>(TYPES.Client).toConstantValue(clientInstance);
 
-	const bot = container.get<Bot>(TYPES.Bot);
+    const bot = container.get<Bot>(TYPES.Bot);
 
-	beforeEach(() => {
-		reset(clientMock);
-	});
+    beforeEach(() => {
+        reset(clientMock);
+    });
 
-	it("Setup should try login client with injected token", async () => {
-		await bot.setup();
-		verify(clientMock.login(fakeToken)).once();
-	});
+    it("Setup should try login client with injected token", async () => {
+        await bot.setup();
+        verify(clientMock.login(fakeToken)).once();
+    });
 });

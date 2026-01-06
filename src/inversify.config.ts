@@ -18,70 +18,57 @@ import { TYPES } from "./types";
 
 const container = new Container();
 
-container
-	.bind<(message: any) => void>(TYPES.Log)
-	.toFunction(console.log);
+container.bind<(message: any) => void>(TYPES.Log).toFunction(console.log);
 container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
 container.bind<Client>(TYPES.Client).toConstantValue(
-	new Client({
-		intents: [
-			Intents.FLAGS.GUILDS,
-			Intents.FLAGS.GUILD_MESSAGES,
-		],
-	})
+    new Client({
+        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+    }),
 );
 container
-	.bind<MappedResponder>(TYPES.MappedResponder)
-	.to(MappedResponder)
-	.inRequestScope();
+    .bind<MappedResponder>(TYPES.MappedResponder)
+    .to(MappedResponder)
+    .inRequestScope();
 container
-	.bind<MessageBroker>(TYPES.MessageBroker)
-	.to(MessageBroker)
-	.inSingletonScope();
+    .bind<MessageBroker>(TYPES.MessageBroker)
+    .to(MessageBroker)
+    .inSingletonScope();
 container
-	.bind<MessageHandlerService>(TYPES.MessageHandlerService)
-	.to(MessageHandlerService)
-	.inSingletonScope();
+    .bind<MessageHandlerService>(TYPES.MessageHandlerService)
+    .to(MessageHandlerService)
+    .inSingletonScope();
 container
-	.bind<Map<string, string | string[]>>(TYPES.ResponseMap)
-	.toConstantValue(ResponseMap);
+    .bind<Map<string, string | string[]>>(TYPES.ResponseMap)
+    .toConstantValue(ResponseMap);
 container
-	.bind<StretchScheduledMessenger>(
-		TYPES.StretchScheduledMessenger
-	)
-	.to(StretchScheduledMessenger)
-	.inSingletonScope();
+    .bind<StretchScheduledMessenger>(TYPES.StretchScheduledMessenger)
+    .to(StretchScheduledMessenger)
+    .inSingletonScope();
+container.bind<AppSettings>(TYPES.AppSettings).toConstantValue(appSettings);
 container
-	.bind<AppSettings>(TYPES.AppSettings)
-	.toConstantValue(appSettings);
+    .bind<ScheduledMessengerService>(TYPES.ScheduledMessengerService)
+    .to(ScheduledMessengerService)
+    .inSingletonScope();
 container
-	.bind<ScheduledMessengerService>(
-		TYPES.ScheduledMessengerService
-	)
-	.to(ScheduledMessengerService)
-	.inSingletonScope();
+    .bind<LoggingService>(TYPES.LoggingService)
+    .to(LoggingService)
+    .inSingletonScope();
 container
-	.bind<LoggingService>(TYPES.LoggingService)
-	.to(LoggingService)
-	.inSingletonScope();
+    .bind<SlashCommandService>(TYPES.SlashCommandService)
+    .to(SlashCommandService)
+    .inSingletonScope();
 container
-	.bind<SlashCommandService>(TYPES.SlashCommandService)
-	.to(SlashCommandService)
-	.inSingletonScope();
+    .bind<ReminderCommand>(TYPES.ReminderCommand)
+    .to(ReminderCommand)
+    .inSingletonScope();
 container
-	.bind<ReminderCommand>(TYPES.ReminderCommand)
-	.to(ReminderCommand)
-	.inSingletonScope();
+    .bind<BotRepository>(TYPES.BotRepository)
+    .to(BotRepository)
+    .inSingletonScope();
 container
-	.bind<BotRepository>(TYPES.BotRepository)
-	.to(BotRepository)
-	.inSingletonScope();
-container
-	.bind<DbService>(TYPES.DbService)
-	.toConstantValue(
-		new DbService("./bot.db").InitializeDatabase(
-			"./schema.txt"
-		)
-	);
+    .bind<DbService>(TYPES.DbService)
+    .toConstantValue(
+        new DbService("./bot.db").InitializeDatabase("./schema.txt"),
+    );
 
 export default container;

@@ -4,16 +4,14 @@ import { injectable } from "inversify";
 
 @injectable()
 export abstract class SlashCommand {
-	constructor() {}
+    constructor() {}
 
-	public abstract command: Omit<
-		SlashCommandBuilder,
-		"addSubcommand" | "addSubcommandGroup"
-	>;
+    public abstract command: Omit<
+        SlashCommandBuilder,
+        "addSubcommand" | "addSubcommandGroup"
+    >;
 
-	public abstract Handle(
-		interaction: CommandInteraction
-	): void;
+    public abstract Handle(interaction: CommandInteraction): void;
 
-	public dispose?(): void;
+    public dispose?(): void;
 }

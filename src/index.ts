@@ -8,39 +8,29 @@ import { SlashCommandService } from "./slash-commands/slash-command.service";
 import { TYPES } from "./types";
 
 // Register handlers and scheduled messages
-const messageHandlerService =
-	container.get<MessageHandlerService>(
-		TYPES.MessageHandlerService
-	);
+const messageHandlerService = container.get<MessageHandlerService>(
+    TYPES.MessageHandlerService,
+);
 messageHandlerService.registerResponder();
-const scheduledMessengerService =
-	container.get<ScheduledMessengerService>(
-		TYPES.ScheduledMessengerService
-	);
+const scheduledMessengerService = container.get<ScheduledMessengerService>(
+    TYPES.ScheduledMessengerService,
+);
 scheduledMessengerService.registerScheduler();
-const slashCommandService =
-	container.get<SlashCommandService>(
-		TYPES.SlashCommandService
-	);
+const slashCommandService = container.get<SlashCommandService>(
+    TYPES.SlashCommandService,
+);
 slashCommandService.registerCommands();
 
 // Setup Bot for discord interaction
-const logger = container.get<LoggingService>(
-	TYPES.LoggingService
-);
+const logger = container.get<LoggingService>(TYPES.LoggingService);
 const bot = container.get<Bot>(TYPES.Bot);
-bot
-	.setup()
-	.then(_ =>
-		logger.LogMessage("Bot successfully started!", false)
-	)
-	.catch(error => logger.LogError(error, false));
+bot.setup()
+    .then((_) => logger.LogMessage("Bot successfully started!", false))
+    .catch((error) => logger.LogError(error, false));
 
 const onTerminate = () => {
-	logger.LogWarning("Bot is shutting down!", false);
-	slashCommandService.dispose();
-	process.exit(0);
+    logger.LogWarning("Bot is shutting down!", false);
+    slashCommandService.dispose();
+    process.exit(0);
 };
-["SIGHUP", "SIGTERM", "SIGINT"].forEach(ev =>
-	process.on(ev, onTerminate)
-);
+["SIGHUP", "SIGTERM", "SIGINT"].forEach((ev) => process.on(ev, onTerminate));
