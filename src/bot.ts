@@ -1,15 +1,16 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
 import {
-	Channel,
+	AnyChannel,
 	Client,
-	CommandInteraction,
 	Message,
-	TextChannel,
+	TextBasedChannel,
+	TextBasedChannelTypes,
 	User,
 } from "discord.js";
 import { inject, injectable } from "inversify";
 import { debounceTime } from "rxjs";
+import { AppSettings } from "./app-settings";
 import { LoggingService } from "./logging.service";
 import { MessageBroker } from "./message-broker";
 import { SendMessageModel } from "./models/send-message.model";
@@ -20,22 +21,12 @@ import { TYPES } from "./types";
 export class Bot {
 	constructor(
 		@inject(TYPES.Client) private client: Client,
-		@inject(TYPES.Token) private token: string,
-		@inject(TYPES.MessageBroker)
-		private messageBroker: MessageBroker,
-		@inject(TYPES.LoggingService)
-		private loggingService: LoggingService
-	) {}
-
-	constructor(
-		@inject(TYPES.Client) private client: Client,
-		@inject(TYPES.Token) private token: string,
 		@inject(TYPES.MessageBroker)
 		private messageBroker: MessageBroker,
 		@inject(TYPES.LoggingService)
 		private loggingService: LoggingService,
-		@inject(TYPES.ClientId) private clientId: string,
-		@inject(TYPES.GuildId) private guildId: string
+		@inject(TYPES.AppSettings)
+		private appSettings: AppSettings
 	) {}
 
 	public setup(): Promise<Bot> {
@@ -50,14 +41,12 @@ export class Bot {
 			this.messageBroker.dispatchMessageReceived(message);
 		});
 
-		this.client.on(
-			"interactionCreate",
-			(interaction: CommandInteraction) => {
-				this.messageBroker.dispatchMessageReceived(
+		this.client.on("interactionCreate", interaction => {
+			interaction.inCachedGuild() &&
+				this.messageBroker.dispatchInteractionReceived(
 					interaction
 				);
-			}
-		);
+		});
 
 		this.messageBroker.onSendMessage$.subscribe(
 			(sendMessage: SendMessageModel) =>
@@ -76,7 +65,7 @@ export class Bot {
 
 		return new Promise((resolve, reject) => {
 			this.client
-				.login(this.token)
+				.login(this.appSettings.Token)
 				.then(_ => resolve(this))
 				.catch(err => {
 					reject(err);
@@ -91,14 +80,14 @@ export class Bot {
 			slashCommand => slashCommand.command.toJSON()
 		);
 		const rest = new REST({ version: "9" }).setToken(
-			this.token
+			this.appSettings.Token
 		);
 		return new Promise((resolve, reject) => {
 			rest
 				.put(
 					Routes.applicationGuildCommands(
-						this.clientId,
-						this.guildId
+						this.appSettings.ClientId,
+						this.appSettings.GuildId
 					),
 					{ body: commandsToRegister }
 				)
@@ -116,7 +105,9 @@ export class Bot {
 	) {
 		if (channelId) {
 			this.getChannel(channelId).then(
-				(channel: TextChannel) => channel.send({ content })
+				channel =>
+					this.isTextBasedChannel(channel) &&
+					channel?.send({ content })
 			);
 		}
 		if (userId) {
@@ -132,7 +123,27 @@ export class Bot {
 		}
 	}
 
-	private getChannel(channelId: string): Promise<Channel> {
+	private isTextBasedChannel(
+		channel: AnyChannel
+	): channel is TextBasedChannel {
+		const textChannelTypes: Array<TextBasedChannelTypes> = [
+			"DM",
+			"GUILD_NEWS",
+			"GUILD_STAGE_VOICE",
+			"GUILD_TEXT",
+			"GUILD_NEWS_THREAD",
+			"GUILD_PUBLIC_THREAD",
+			"GUILD_PRIVATE_THREAD",
+			"GUILD_VOICE",
+		];
+		return textChannelTypes.includes(
+			channel.type as TextBasedChannelTypes
+		);
+	}
+
+	private getChannel(
+		channelId: string
+	): Promise<AnyChannel | undefined> {
 		const channel =
 			this.client.channels.cache.get(channelId);
 		if (channel) {
